@@ -1,0 +1,42 @@
+/*
+Error: Invalid GBK character "\xE3"
+        on line 5 of app.scss
+
+1: @font-face {
+2:   font-family: 'webfont';
+3:   src: url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.eot'); /* IE9*\/
+4:   src: url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 *\/
+5:   url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.woff') format('woff'), /* chrome、firefox *\/
+6:   url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*\/
+7:   url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.svg#思源黑体-粗') format('svg'); /* iOS 4.1- *\/
+8: }
+
+Backtrace:
+app.scss:5
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/util.rb:1300:in `rescue in block in find_encoding_error'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/util.rb:1297:in `block in find_encoding_error'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/util.rb:1296:in `each'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/util.rb:1296:in `each_with_index'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/util.rb:1296:in `find_encoding_error'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/util.rb:905:in `check_sass_encoding'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/engine.rb:436:in `check_encoding!'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/engine.rb:392:in `_to_tree'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/engine.rb:381:in `_render_with_sourcemap'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/engine.rb:298:in `render_with_sourcemap'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/plugin/compiler.rb:492:in `update_stylesheet'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/plugin/compiler.rb:209:in `each'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/plugin/compiler.rb:209:in `update_stylesheets'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/plugin.rb:82:in `update_stylesheets'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/exec/sass_scss.rb:340:in `watch_or_update'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/exec/sass_scss.rb:51:in `process_result'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/exec/base.rb:52:in `parse'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/lib/sass/exec/base.rb:19:in `parse!'
+D:/path/Ruby23-x64/lib/ruby/gems/2.3.0/gems/sass-3.4.22/bin/scss:13:in `<top (required)>'
+D:/path/Ruby23-x64/bin/scss:23:in `load'
+D:/path/Ruby23-x64/bin/scss:23:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Error: Invalid GBK character \"\xE3\"\A         on line 5 of app.scss\A \A 1: @font-face {\A 2:   font-family: 'webfont';\A 3:   src: url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.eot'); /* IE9*/\A 4:   src: url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */\A 5:   url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.woff') format('woff'), /* chrome、firefox */\A 6:   url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/\A 7:   url('//at.alicdn.com/t/dmy3nhbpqi2akyb9.svg#思源黑体-粗') format('svg'); /* iOS 4.1- */\A 8: }"; }
