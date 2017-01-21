@@ -1,10 +1,15 @@
 var path = require('path')
 var webpack = require('webpack')
+var merge = require('webpack-merge')
+var ExtractTextPlugin = require('extract-text-webpack-plugin')
+var BaseDir = '/'
+var env = 'dev' // production or dev
 
-module.exports = {
+var base = {
   entry: {
     app: './resources/assets/js/main.js',
-    vendor: [ 'vue', 'vue-router', 'axios','vuerify','v-vuerify-next','vue-material','lodash','base64-url' ]
+    vendor: [ 'vue', 'vue-router', 'axios',
+      'vuex', 'vuerify', 'vue-material', 'lodash' ]
   },
   // 输出配置
   output: {
@@ -15,97 +20,144 @@ module.exports = {
     filename: "[name].js",
 
     // 异步加载的业务模块，例如按需加载的.vue单文件组件
-    chunkFilename: "[id].[name].[chunkHash].js",
+    chunkFilename: "[id].[chunkHash].js",
 
-    publicPath: './js/'
-  },
-  module: {
-      loaders: [
-          {
-              test: /\.js$/,
-              loader: 'babel-loader',
-              exclude: /node_modules/
-          },
-          {
-            test: /\.json$/,
-            loader: 'json'
-          },
-          {
-              test: /\.css$/,
-              loader: 'style-loader!css-loader'
-          },
-          {
-              test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
-              loader: 'file-loader'
-          },
-          {
-              test: /\.(png|jpe?g|gif|svg)(\?\S*)?$/,
-              loader: 'file-loader',
-              query: {
-                  name: '[name].[ext]?[hash]'
-              }
-          }
-      ],
-      rules: [
-          {
-              test: /\.vue$/,
-              loader: 'vue-loader',
-              options: {
-                  loaders: {
-                      // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
-                      // the "scss" and "sass" values for the lang attribute to the right configs here.
-                      // other preprocessors should work out of the box, no loader config like this nessessary.
-                      'scss': 'vue-style-loader!css-loader!sass-loader',
-                      'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
-                  }
-                  // other vue-loader options go here
-              }
-          }
-      ]
+    publicPath: "/js/"
   },
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.js'
+      'vue$': 'vue/dist/vue.min.js',
+      'logger': 'vuex/dist/logger.js'
     },
     extensions: ['', '.js', '.vue'] // 引用js和vue文件可以省略后缀名
   },
-  devServer: {
-    historyApiFallback: true,
-    noInfo: true
+  vue: {
+    loaders: {
+      css: 'css-loader',
+      scss: 'css-loader!sass-loader'
+    }
   },
-  performance: {
-    hints: false
+  module: {
+    loaders: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
+        loader: 'file-loader'
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?\S*)?$/,
+        loader: 'file-loader',
+        query: {
+          name: '[name].[ext]?[hash]'
+        }
+      }
+    ],
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          loaders: {
+            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
+            // the "scss" and "sass" values for the lang attribute to the right configs here.
+            // other preprocessors should work out of the box, no loader config like this nessessary.
+            'scss': 'vue-style-loader!css-loader!sass-loader',
+            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
+          }
+          // other vue-loader options go here
+        }
+      }
+    ]
   },
-  devtool: '#eval-source-map',
+  devtool: '#cheap-module-source-map',
   plugins: [
-    // http://vuejs.github.io/vue-loader/en/workflow/production.html
+    new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.NoErrorsPlugin()
+  ]
+}
+
+
+var production = merge(base, {
+  stats: {
+    children: false
+  },
+  module: {
+    rules: [{
+      enforce: 'pre',
+      test: /\.js$/,
+      loader: "eslint-loader",
+      exclude: /node_modules/
+    }, {
+      test: /\.(png|jpg|jpeg|gif|svg|eot|woff|ttf)$/,
+      loader: 'url?limit=10000&name=' + BaseDir + 'images/[name].[ext]',
+    }]
+  },
+  plugins: [
     new webpack.DefinePlugin({
-      'process.env': "'production'"
+      'process.env': {
+        NODE_ENV: '"production"'
+      }
     }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
       }
     }),
-    // split vendor js into its own file
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: function (module, count) {
-        // any required modules inside node_modules are extracted to vendor
-        return (
-            module.resource &&
-            /\.js$/.test(module.resource) &&
-            module.resource.indexOf(
-                path.join(__dirname, '../node_modules')
-            ) === 0
-        )
+    new webpack.LoaderOptionsPlugin({
+      vue: {
+        postcss: [
+          require('autoprefixer')({
+            browsers: ['> 0%']
+          }),
+          require('precss')()
+        ],
+        css: ExtractTextPlugin.extract({
+          loader: "css-loader",
+          fallbackLoader: "vue-style-loader"
+        })
+      },
+      eslint: {
+        configFile: '../.eslintrc'
       }
     }),
-    // extract webpack runtime and module manifest to its own file in order to
-    // prevent vendor hash from being updated whenever app bundle is updated
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest',
-      chunks: ['vendor']
+      name: 'vendor',
+      filename: 'vendor.bundle.js'
     })
   ]
-};
+});
+var dev = merge(base, {
+  module: {
+    rules: [{
+      test: /\.(png|jpg|jpeg|gif|svg|eot|woff|ttf)$/,
+      loader: 'url?limit=10000&name=images/[name].[ext]',
+    }]
+  },
+  devtool: '#eval-source-map',
+  plugins: [
+    new webpack.LoaderOptionsPlugin({
+      vue: {
+        postcss: [
+          require('autoprefixer')({
+            browsers: ['> 0%']
+          }),
+          require('precss')()
+        ]
+      }
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      filename: 'vendor.bundle.js'
+    })
+  ]
+});
+
+module.exports = env === 'production' ? production : dev

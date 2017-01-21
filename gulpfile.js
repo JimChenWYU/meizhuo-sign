@@ -13,7 +13,7 @@ require('laravel-elixir-vue-2');
  | file for our application, as well as publishing vendor resources.
  |
  */
-elixir(mix => {
-    mix.sass('app.scss')
-        .webpack('main.js')
+elixir(function (mix) {
+  mix.sass('app.scss')
+      .webpack('main.js')
 });

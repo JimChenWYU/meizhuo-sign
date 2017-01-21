@@ -4,7 +4,7 @@
   </md-toolbar>
 </template>
 
-<style scoped>
+<style lang="sass" scoped>
   .md-title {
   	text-align: center;
   }

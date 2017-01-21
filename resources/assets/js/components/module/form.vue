@@ -4,7 +4,6 @@
 	  <label>姓名</label>
 	  <md-input type="text"
 				v-model="name"
-				v-vuerify="'name'"
 				required></md-input>
 	  <span class="md-error"
 			v-for="(error, index) of errors.name"
@@ -106,7 +105,17 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex'
+
   export default {
+    created () {
+      console.log(this.$store)
+      this.setHeader({
+      	title: '袂卓工作室线上报名',
+      	type: 'user.sign'
+      })
+    },
+
   	data () {
   	  return {
   	  	name: '陈君武',
@@ -170,8 +179,13 @@
 	  }
   	},
 	methods: {
+
+	  ...mapActions([
+		'setHeader'
+	  ]),
+
 	  submit() {
-		this.$http.post('/sign', this.userData)
+		this.$http.post(this.$env.userSign, this.userData)
 		  .then(response => {
 		  	let data = response.data
 
@@ -196,7 +210,7 @@
 		// console.log(this.userData);
 	  },
 	  onClose(type) {
-		console.log('Closed', type)
+		// console.log('Closed', type)
 	  },
 	  onConfirmClose(type) {
 	  	if (type === 'ok') {
@@ -220,7 +234,6 @@
 		  	this.$refs[ref].open();
 		  	break;
 	  	}
-
 	  },
 	  closeDialog(ref) {
 		this.$refs[ref].close();

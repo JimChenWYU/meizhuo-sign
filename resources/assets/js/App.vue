@@ -1,33 +1,31 @@
 <template>
-  <div id="app">
-	<transition name="fade">
-	  <router-view></router-view>
-	</transition>
-  </div>
+  <transition name="fade">
+  	<router-view></router-view>
+  </transition>
 </template>
 
-<style>
+<style lang="sass">
   * {
 	margin: 0;
 	padding: 0;
   }
 
-  html,body {
+  html {
 	height: 100%;
+	body {
+	  margin: 0;
+	  padding: 0;
+	  width: 100%;
+	  line-height: 1.5;
+	  font-family: Roboto,Noto Sans, Noto,sans-serif;
+	}
   }
-
-  body {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	line-height: 1.5;
-	font-family: 'webfont';
-  }
-
 </style>
 
 <script>
   export default{
-	name: 'app'
+	name: 'app',
+	created () {
+	}
   }
 </script>

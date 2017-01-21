@@ -13,23 +13,12 @@ import './bootstrap'
  */
 import Vue from 'vue'
 import App from './App'
-import VueMaterial from 'vue-material'
-import Vuerify from 'vuerify'
-import VuerifyDirective from 'v-vuerify-next'
 import router from './router/index'
-import Extension from './utils/install'
-import 'vue-material/dist/vue-material.css'
-
-
-Vue.use(VueMaterial);
-Vue.use(Vuerify);
-Vue.use(VuerifyDirective);
-Vue.use(Extension);
-
-//console.log(Extension);
+import store from './store/index'
 
 new Vue({
   el: '#app',
   router,
+  store,
   render: h => h(App)
 });

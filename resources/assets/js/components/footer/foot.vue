@@ -1,17 +1,18 @@
 <template>
-  <div>
-	<foot-sign v-if="type === 'sign'"></foot-sign>
-	<foot-admin v-if="type === 'admin'"></foot-admin>
-  </div>
+  <foot-sign></foot-sign>
+
+  <!--<div>-->
+	<!--<foot-admin v-if="getFooter.footer_type === 'admin.login'"></foot-admin>-->
+	<!--<foot-sign v-else></foot-sign>-->
+  <!--</div>-->
 </template>
 
 <script>
   import footSign from './foot_sign'
   import footAdmin from './foot_admin'
   export default {
-  	props: [ 'type' ],
   	components: {
 	  footSign,footAdmin
-	},
+	}
   }
 </script>

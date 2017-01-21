@@ -3,7 +3,7 @@
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import sign from './sign'
+import user from './user'
 import admin from './admin'
 
 Vue.use(VueRouter);
@@ -18,18 +18,18 @@ const router = new VueRouter({
       component: require('../App'),
       children: [
         {
-          path: '/sign',
-          component: resolve => require(['../components/body/layout_form'], resolve),
-          children: sign
+          path: '/user',
+          component: require('../components/layout_user'),
+          children: user
         },
         {
           path: '/admin',
-          component: resolve => require(['../components/body/layout_form'], resolve),
+          component: require('../components/layout_admin'),
           children: admin
         },
         {
           path: '*',
-          redirect:'/sign'
+          redirect:'/user'
         }
       ]
     }

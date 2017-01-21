@@ -1,9 +1,6 @@
-@font-face {
-  font-family: 'webfont';
-  src: url("//at.alicdn.com/t/csv35ibueihhbyb9.eot");
-  /* IE9*/
-  src: url("//at.alicdn.com/t/csv35ibueihhbyb9.eot?#iefix") format("embedded-opentype"), url("//at.alicdn.com/t/csv35ibueihhbyb9.woff") format("woff"), url("//at.alicdn.com/t/csv35ibueihhbyb9.ttf") format("truetype"), url("//at.alicdn.com/t/csv35ibueihhbyb9.svg#NotoSansHans-DemiLight") format("svg");
-  /* iOS 4.1- */
-}
+/* Common */
+/* Responsive Breakpoints */
+/* Transitions - Based on Angular Material */
+/* Elevation - Based on Angular Material */
 
 /*# sourceMappingURL=app.css.map */

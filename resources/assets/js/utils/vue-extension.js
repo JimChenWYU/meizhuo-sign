@@ -1,11 +1,13 @@
 /**
  * Created by lenovo on 2017/01/18.
  */
-import base64url from 'base64-url'
 import _ from 'lodash'
 
-(function () {
-  'use strict';
+(function (global, factory) {
+  if (typeof exports === 'object' && typeof module !== 'undefined') {
+    module.exports = factory()
+  }
+}(this, (function () { 'use strict';
 
   function extend(_from, _to) {
     for(let key in _from) {
@@ -15,12 +17,8 @@ import _ from 'lodash'
   }
   function $extension () {}
 
-  extend(base64url, $extension.prototype);
   extend(_, $extension.prototype);
 
-  if (typeof exports === 'object' && typeof module !== 'undefined') {
+  return new $extension()
 
-    module.exports = new $extension()
-
-  }
-})();
+})))

@@ -3,13 +3,18 @@
  */
 const admin = [
   {
-    name: 'admin',
+    name: 'admin.login',
     path: '/',
-    component: resolve => require(['../views/login'], resolve)
+    component: resolve => {
+      require(['../components/views/admin_login'], resolve)
+    }
   },
   {
-    path: '/show',
-    component: resolve => require(['../views/form'], resolve)
+    name: 'admin.show',
+    path: '/admin/show',
+    component: resolve => {
+      require(['../components/views/admin_list'], resolve)
+    }
   }
 ];
 

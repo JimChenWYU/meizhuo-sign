@@ -12,16 +12,20 @@
 */
 
 Route::get('/', 'SignController@index');
-Route::get('sign', 'SignController@index');
+Route::get('user', 'SignController@index');
 
 Route::get('admin', 'managerController@index');
 Route::post('admin', 'managerController@login');
+Route::get('admin/show', 'managerController@show');
 
-Route::group([ 'middleware' => [ 'jwt.refresh', 'jwt.auth' ] ], function () {
+Route::group([ 'middleware' => [ 'jwt.auth' ] ], function () {
 
     Route::post('admin/test', 'managerController@testToken');
+    Route::get('admin/signer', 'managerController@getSigners');
+    Route::get('admin/signer/{id}', 'managerController@getSigner');
+
 });
 
 
 
-Route::post('sign', 'SignController@sign');
+Route::post('user', 'SignController@sign');
