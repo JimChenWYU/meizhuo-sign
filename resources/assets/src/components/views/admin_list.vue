@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-display-button>
 	<md-toolbar>
 	  <md-button class="md-icon-button" @click="toggleLeftSidenav">
 		<md-icon>menu</md-icon>
@@ -11,6 +11,7 @@
 	<md-sidenav class="main-sidebar md-left md-fixed" ref="leftSidenav">
 	  <md-toolbar class="md-large">
 		<div class="md-toolbar-container">
+		  <img src="../../assets/image/mz.png" alt="meizhuo logo">
 		  <h3 class="md-title">Sidenav content</h3>
 		</div>
 	  </md-toolbar>
@@ -82,7 +83,7 @@
   	}
   }
 </style>
-<script>
+<script type="es6">
   import { mapActions, mapGetters } from 'vuex'
   import kHead from '../header/head'
   export default{
@@ -92,7 +93,8 @@
       	title: '袂卓工作室招新后台管理',
       	type: 'admin.show'
       })
-	  //console.log(this.getAuthorization)
+	  //console.log(this.getAdmin)
+	  //console.log(this.getAdmin.getToken())
       // this.toggleLeftSidenav()
     },
     data () {
@@ -103,12 +105,12 @@
    	  	  {position: 'bottom top'},
    	  	  {position: 'bottom left'},
    	  	  {position: 'top left'},
-   	  	  {position: 'top right'},
+   	  	  {position: 'top right'}
    	  	]
    	  }
     },
     computed: {
-      ...mapGetters([ 'getHeader', 'getAuthorization' ])
+      ...mapGetters([ 'getHeader', 'getAdmin' ])
     },
     methods: {
       ...mapActions(['setHeader', 'setFooter']),
@@ -116,18 +118,24 @@
       	this.isShowSideNav = !this.isShowSideNav
       },
       toggleLeftSidenav() {
-		console.log(this.$refs)
 		this.$refs.leftSidenav.toggle();
 	  },
 	  closeLeftSidenav() {
 		this.$refs.leftSidenav.close();
 	  },
       open(ref) {
-		console.log('Opened: ' + ref);
+		//console.log('Opened: ' + ref);
 	  },
 	  close(ref) {
-		console.log('Closed: ' + ref);
+		//console.log('Closed: ' + ref);
 	  }
+    },
+    directives: {
+      displayButton: {
+      	inserted (el) {
+		  console.log(el)
+		}
+      }
     }
   }
 </script>

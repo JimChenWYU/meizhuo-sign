@@ -104,7 +104,7 @@
   </form>
 </template>
 
-<script>
+<script type="es6">
   import { mapActions } from 'vuex'
 
   export default {

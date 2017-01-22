@@ -40,9 +40,9 @@ export const setBody = ({ commit }, body) => {
   }
 }
 
-export const setAuthorization = ({ commit }, admin) => {
+export const setAdmin = ({ commit }, admin) => {
   if (typeof admin !== 'undefined') {
-    commit(types.AUTHORIZATION, {
+    commit(types.ADMIN_SET_AUTHORIZATION, {
       token: admin.token
     })
   }

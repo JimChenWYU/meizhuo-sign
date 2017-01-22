@@ -15,6 +15,8 @@ Route::get('/', 'SignController@index');
 Route::get('user', 'SignController@index');
 
 Route::get('admin', 'managerController@index');
+Route::get('admin/login', 'managerController@index');
+Route::post('admin', 'managerController@login');
 Route::post('admin', 'managerController@login');
 Route::get('admin/show', 'managerController@show');
 
@@ -29,3 +31,10 @@ Route::group([ 'middleware' => [ 'jwt.auth' ] ], function () {
 
 
 Route::post('user', 'SignController@sign');
+
+Route::get('test', function () {
+   return view('index', [
+       'title' => 'test',
+       'type' => '__TEST__'
+   ]);
+});

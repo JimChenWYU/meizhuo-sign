@@ -14,6 +14,6 @@ export const getBody = state => {
   return state.body
 }
 
-export const getAuthorization = state => {
+export const getAdmin = state => {
   return state.admin
 }

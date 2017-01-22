@@ -7,14 +7,14 @@ var env = 'dev' // production or dev
 
 var base = {
   entry: {
-    app: './resources/assets/js/main.js',
+    app: './resources/assets/src/main.js',
     vendor: [ 'vue', 'vue-router', 'axios',
       'vuex', 'vuerify', 'vue-material', 'lodash' ]
   },
   // 输出配置
   output: {
     // 输出的js文件，路径相对于本文件所在的位置
-    path: path.resolve(__dirname, "./public/js/"),
+    path: path.resolve(__dirname, "./public/src/"),
 
     // 将入口文件中涉及到的同步加载的js文件打包成一个js文件，基于文件的md5生成hash名称的script来防止缓存
     filename: "[name].js",
@@ -22,7 +22,7 @@ var base = {
     // 异步加载的业务模块，例如按需加载的.vue单文件组件
     chunkFilename: "[id].[chunkHash].js",
 
-    publicPath: "/js/"
+    publicPath: "/src/"
   },
   resolve: {
     alias: {
@@ -30,12 +30,6 @@ var base = {
       'logger': 'vuex/dist/logger.js'
     },
     extensions: ['', '.js', '.vue'] // 引用js和vue文件可以省略后缀名
-  },
-  vue: {
-    loaders: {
-      css: 'css-loader',
-      scss: 'css-loader!sass-loader'
-    }
   },
   module: {
     loaders: [
@@ -56,6 +50,7 @@ var base = {
         test: /\.(png|jpe?g|gif|svg)(\?\S*)?$/,
         loader: 'file-loader',
         query: {
+          path: 'js/',
           name: '[name].[ext]?[hash]'
         }
       }
@@ -141,7 +136,7 @@ var dev = merge(base, {
       loader: 'url?limit=10000&name=images/[name].[ext]',
     }]
   },
-  devtool: '#eval-source-map',
+  devtool: '#cheap-eval-source-map',
   plugins: [
     new webpack.LoaderOptionsPlugin({
       vue: {

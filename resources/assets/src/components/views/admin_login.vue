@@ -3,11 +3,13 @@
         <k-head></k-head>
 
         <md-layout md-gutter>
-            <md-layout md-flex="25" md-hide-xsmall></md-layout>
+            <md-layout md-flex="20" md-hide-xsmall></md-layout>
+            <md-layout md-flex="10"></md-layout>
             <md-layout md-column>
                 <k-login></k-login>
             </md-layout>
-            <md-layout md-flex="25" md-hide-xsmall></md-layout>
+            <md-layout md-flex="10"></md-layout>
+            <md-layout md-flex="20" md-hide-xsmall></md-layout>
         </md-layout>
 
         <k-footer class="admin-login__footer"></k-footer>

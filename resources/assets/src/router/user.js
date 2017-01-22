@@ -5,9 +5,7 @@ const user = [
   {
     name: 'user.sign',
     path: '/',
-    component: resolve => {
-      require(['../components/views/user_form'], resolve)
-    }
+    component: require('../components/views/user_form')
   }
 ];
 

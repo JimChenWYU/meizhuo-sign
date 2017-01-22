@@ -5,16 +5,12 @@ const admin = [
   {
     name: 'admin.login',
     path: '/',
-    component: resolve => {
-      require(['../components/views/admin_login'], resolve)
-    }
+    component: require('../components/views/admin_login')
   },
   {
     name: 'admin.show',
     path: '/admin/show',
-    component: resolve => {
-      require(['../components/views/admin_list'], resolve)
-    }
+    component: require('../components/views/admin_list')
   }
 ];
 

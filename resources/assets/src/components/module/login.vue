@@ -28,15 +28,17 @@
 	  <md-button class="md-raised md-primary" type="submit" md-fab-bottom-center>确定</md-button>
 	</md-layout>
 
-	<!--<md-spinner :md-size="100"-->
-	  <!--:md-stroke="1.5"-->
-	  <!--md-indeterminate-->
-	  <!--v-show="isLoading"-->
-	  <!--class="spinner"></md-spinner>-->
+	<md-spinner :md-size="100"
+	  :md-stroke="1.5"
+	  md-indeterminate
+	  v-show="isLoading"
+	  class="spinner"></md-spinner>
 
 	<md-dialog-alert
 		:md-content="alert.content"
 		:md-ok-text="alert.ok"
+		@open="onOpen"
+		@close="onOpen"
 		ref="login-tip">
 	</md-dialog-alert>
   </form>
@@ -56,7 +58,7 @@
   }
 </style>
 
-<script>
+<script type="es6">
   import { mapActions } from 'vuex'
   export default{
     created () {
@@ -105,7 +107,7 @@
 
 	methods: {
 
-	  ...mapActions(['setHeader', 'setBody', 'setAuthorization']),
+	  ...mapActions(['setHeader', 'setBody', 'setAdmin']),
 
 	  setLoading () {
 	  	this.isLoading = !this.isLoading
@@ -122,17 +124,21 @@
 	  	this.$http.post(this.$env.adminLogin, this.adminData)
 	  		.then(response => {
 			  let res = response.data
-			  console.log(res)
+			  //console.log(res)
 			  this.setLoading()
-			  this.setAuthorization({
+			  this.setAdmin({
 			  	token: res.data.token
 			  })
-			  this.$router.push(res.data.redirect)
+			  this.$router.replace(res.data.redirect)
 	  		})
 	  		.catch(error => {
 			  this.setLoading()
 			  this.openDialog('login-tip', error.msg)
 	  		})
+	  },
+
+	  onOpen() {
+		// console.log(this.userData);
 	  },
 	  openDialog(ref, msg) {
 	  	this.alert.content = msg
