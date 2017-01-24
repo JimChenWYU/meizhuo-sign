@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests;
+use Illuminate\Http\Request;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class ManagerController extends Auth\AuthController
 {
@@ -53,7 +54,7 @@ class ManagerController extends Auth\AuthController
         $this->accept_data['password'] = md5($this->accept_data['password']);
 
         $admin = \DB::table('manager')
-            ->where('account',$this->accept_data['account'])
+            ->where('account', $this->accept_data['account'])
             ->first();
 
         $_password = isset($admin) ? $admin->password : null;
@@ -65,40 +66,89 @@ class ManagerController extends Auth\AuthController
                 http_status('Unprocessable_Entity'));
         }
 
+        $customClaims  = [
+            'permission' => [
+                json_decode('{"name": "all", "value": "全部", "isPermit": true}', true),
+                json_decode('{"name": "android", "value": "移动组", "isPermit": true}', true),
+                json_decode('{"name": "web", "value": "Web组", "isPermit": true}', true),
+                json_decode('{"name": "design", "value": "美工组", "isPermit": true}', true),
+                json_decode('{"name": "marking", "value": "营销策划", "isPermit": true}', true),
+            ]
+        ];
+
+//        dd(json_decode('{"name": "marking", "value": "营销策划", "isPermit": true}'));
         // 登录成功获取token并返回
-        $token = \JWTAuth::fromUser($admin);
+        $token = 'bearer ' . \JWTAuth::fromUser($admin, $customClaims);
+
         // 跳转链接
-        $redirect = 'admin/show';
+        $redirect = '/admin/show/all';
 
         return $this->ajax(
             response_array('登录成功！', compact('redirect', 'token')),
             http_status('OK'));
     }
 
+    /**
+     * name : permission
+     * description : 权限管理
+     * @return mixed
+     */
+    public function permission()
+    {
+        $permission = \JWTAuth::getPayload()->get('permission');
+
+        $admin = false;
+
+        if ($permission) {
+            $admin = [
+                'welcome' => '欢迎管理员，',
+                'operate' => '退出',
+                'skipTo' => [ 'name' => 'admin.login' ] ];
+            return $this->ajax(
+                response_array('success', compact('admin', 'permission')));
+        }
+
+        $redirect = '/admin';
+
+        return $this->ajax(
+            response_array('Permission_Not_Found', compact('admin', 'redirect')),
+            http_status('Not_Found'));
+    }
+
+    /**
+     * name : getSigners
+     * description : 获取报名者列表
+     * @return mixed
+     */
     public function getSigners()
     {
-        // 过滤其他数据
-        $current_page = isset($this->accept_data['page']) ?
-            $this->accept_data['page'] : 1;
+        // 获取参数
+        $pagination = [
+            'page' => isset($this->accept_data['page']) ?
+                $this->accept_data['page'] : 1,
+            'size' => isset($this->accept_data['size']) ?
+                $this->accept_data['size'] : 7,
+        ];
 
         $accept_data = [];
         list($keys, $values) = array_divide(
             request()->only('student_id', 'name', 'department'));
-        array_map(function ($key, $value) use(&$accept_data) {
-            if (isset($value)) {
+        array_map(function ($key, $value) use (&$accept_data) {
+            if (!empty($value)) {
                 $accept_data[$key] = $value;
             }
         }, $keys, $values);
 
         $select_params = [ 'id', 'student_id',
-            'name', 'major', 'phone_num', 'department' ];
+            'name', 'major', 'grade', 'phone_num', 'department' ];
 
         // 获取列表数据
-        $info = \Signer::getSigner($accept_data, $current_page, $select_params);
+        $info = \Signer::getSigner($accept_data, $select_params, $pagination);
 
         // 分离分页参数和数据
         $signers = array_pop($info);
 
+//        dd($accept_data);
         // 封装数据
         $response = response_array('success', $signers);
 
@@ -125,10 +175,12 @@ class ManagerController extends Auth\AuthController
             'id' => 'required|numeric'
         ]);
 
-        //        验证失败处理，返回412
+        $redirect = '/admin';
+
+        //    验证失败处理，返回412
         if ($validator->fails()) {
             return $this->ajax(
-                $validator->errors()->first(),
+                response_array($validator->errors()->first(), compact('redirect')),
                 http_status('Precondition_Failed'));
         }
 
@@ -141,7 +193,11 @@ class ManagerController extends Auth\AuthController
         $signer = array_pop($info);
 
         // 封装数据
-        $response = response_array('success', $signer[0]);
+        if (count($signer)) {
+            $response = response_array('success', $signer[0]);
+        }else {
+            $response = response_array('No_Content');
+        }
 
         // 判别是否有数据
         if ($response['count'] > 0) {
@@ -154,6 +210,8 @@ class ManagerController extends Auth\AuthController
 
     public function testToken()
     {
-        return $this->ajax(response_array('ok', \JWTAuth::getToken()));
+        $payload = \JWTAuth::getPayload();
+        dd($payload->get('permission'));
+        return $this->ajax(response_array('ok', $payload->get('permission')));
     }
 }

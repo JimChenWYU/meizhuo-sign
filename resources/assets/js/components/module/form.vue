@@ -3,7 +3,8 @@
 	<md-input-container :class="{ 'md-input-invalid' : errors.name }">
 	  <label>姓名</label>
 	  <md-input type="text"
-				v-model="name"
+				v-model.trim="name"
+				v-focus
 				required></md-input>
 	  <span class="md-error"
 			v-for="(error, index) of errors.name"
@@ -12,8 +13,8 @@
 
 	<md-input-container :class="{ 'md-input-invalid' : errors.student_id }">
 	  <label>学号</label>
-	  <md-input type="text"
-				v-model.number="student_id"
+	  <md-input type="number"
+				v-model.number.trim="student_id"
 				required></md-input>
 	  <span class="md-error"
 			v-for="(error, index) of errors.student_id"
@@ -23,7 +24,7 @@
 	<md-input-container :class="{ 'md-input-invalid' : errors.major }">
 	  <label>专业</label>
 	  <md-input type="text"
-				v-model="major"
+				v-model.trim="major"
 				required></md-input>
 	  <span class="md-error"
 			v-for="(error, index) of errors.major"
@@ -33,7 +34,7 @@
 	<md-input-container :class="{ 'md-input-invalid' : errors.phone_num }">
 	  <label>手机号码</label>
 	  <md-input type="tel"
-				v-model="phone_num"
+				v-model.trim="phone_num"
 				required></md-input>
 	  <span class="md-error"
 			v-for="(error, index) of errors.phone_num"
@@ -72,7 +73,7 @@
 
 	<md-input-container>
 	  <label>简介</label>
-	  <md-textarea maxlength="300" v-model="introduce"></md-textarea>
+	  <md-textarea maxlength="300" v-model.trim="introduce"></md-textarea>
 	  <!--<span class="md-error"-->
 			<!--v-for="(error, index) of errors.introduce"-->
 			<!--v-if="index === 0">{{error}}</span>-->
@@ -109,7 +110,7 @@
 
   export default {
     created () {
-      console.log(this.$store)
+      //console.log(this.$store)
       this.setHeader({
       	title: '袂卓工作室线上报名',
       	type: 'user.sign'

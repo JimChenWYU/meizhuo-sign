@@ -32,35 +32,54 @@ Vue.use(Config)
  */
 export default class Http {
 
-  constructor (baseUrl) {
+  constructor () {
+
     this.http = Axios.create({
-      baseUrl: baseUrl
+      baseUrl: this.getBaseUrl()
     })
 
-    this.request()
+    this.request().response()
 
     return this.http
   }
 
+  getBaseUrl () {
+    if (typeof window !== 'undefined') {
+      let host = window.location.host   // contain port
+      let protocol = window.location.protocol
+
+      return `${protocol}//${host}`
+    }
+    return '/'
+  }
+
   request () {
-    this.http.interceptors.request.use(config => {
+    this.http.interceptors.request.use(request => {
+      request.headers.common['authorization'] = window.localStorage.getItem('token')
       //request.headers.set('X-CSRF-TOKEN', Laravel.csrfToken);
-      return config
+      return request
     }, error => Promise.reject(error))
 
+    return this
+  }
+
+  response () {
     this.http.interceptors.response.use(response => {
+      let authorization = response.headers.authorization
+      if (typeof authorization !== 'undefined') {
+        window.localStorage.setItem('token', authorization)
+      }
       return response
     }, error => {
       let errResponse = error.response
       let res = ''
-      //console.log(errResponse);
       switch (errResponse.status) {
-        case 404:
-          res = '网络有问题！';
-          break;
         case 500:
           res = '服务端繁忙，请稍后！';
           break;
+        case 400:
+        case 401:
+        case 404:
         case 405:
         case 412:
         case 422:
@@ -70,10 +89,12 @@ export default class Http {
       }
       return Promise.reject(res)
     })
+
+    return this
   }
 }
 
-Vue.prototype.$http = new Http(Vue.prototype.$env.baseUrl)
+Vue.prototype.$http = new Http()
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

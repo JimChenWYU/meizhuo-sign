@@ -17,16 +17,17 @@
 </template>
 
 <style lang="sass" scoped>
-    .admin-login__container {
-        min-height: 100%;
-    }
-    .admin-login__footer {
-        position: absolute;
-        bottom: 0;
-    }
+  .admin-login__container {
+	min-height: 100%;
+  }
+  .admin-login__footer {
+	position: absolute;
+	bottom: 0;
+
+  }
 </style>
 
-<script>
+<script type="es6">
   import kHead from '../header/head'
   import kFooter from '../footer/foot'
   import kLogin from '../module/login'

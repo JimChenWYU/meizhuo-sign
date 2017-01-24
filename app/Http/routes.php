@@ -13,24 +13,25 @@
 
 Route::get('/', 'SignController@index');
 Route::get('user', 'SignController@index');
+Route::post('user', 'SignController@sign');
 
-Route::get('admin', 'managerController@index');
-Route::get('admin/login', 'managerController@index');
-Route::post('admin', 'managerController@login');
-Route::post('admin', 'managerController@login');
-Route::get('admin/show', 'managerController@show');
+Route::get('admin', 'ManagerController@index');
+Route::get('admin/login', 'ManagerController@index');
+Route::post('admin', 'ManagerController@login');
+Route::get('admin/show', 'ManagerController@show');
+Route::get('admin/show/{department}', 'ManagerController@show');
+Route::get('admin/show/{department}/{id}', 'ManagerController@show');
 
 Route::group([ 'middleware' => [ 'jwt.auth' ] ], function () {
 
-    Route::post('admin/test', 'managerController@testToken');
-    Route::get('admin/signer', 'managerController@getSigners');
-    Route::get('admin/signer/{id}', 'managerController@getSigner');
+    Route::get('testToken', 'ManagerController@testToken');
+    Route::get('admin/signers', 'ManagerController@getSigners');
+    Route::get('admin/signer', 'ManagerController@getSigner');
+    Route::get('admin/permission', 'ManagerController@permission');
 
 });
 
 
-
-Route::post('user', 'SignController@sign');
 
 Route::get('test', function () {
    return view('index', [

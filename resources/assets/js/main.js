@@ -16,6 +16,12 @@ import App from './App'
 import router from './router/index'
 import store from './store/index'
 
+Vue.directive('focus', {
+  inserted(el) {
+    el.focus()
+  }
+})
+
 new Vue({
   el: '#app',
   router,

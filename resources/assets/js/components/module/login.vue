@@ -6,7 +6,8 @@
 	  <md-input id="account"
 				name="account"
 				type="text"
-				v-model="account"></md-input>
+				v-focus
+				v-model.trim="account"></md-input>
 	  <span class="md-error"
 			v-for="(error, index) of errors.account"
 			v-if="index === 0">{{error}}</span>
@@ -18,7 +19,7 @@
 	  <md-input id="password"
 				name="password"
 				type="password"
-				v-model="password"></md-input>
+				v-model.trim="password"></md-input>
 	  <span class="md-error"
 			v-for="(error, index) of errors.password"
 			v-if="index === 0">{{error}}</span>
@@ -37,8 +38,6 @@
 	<md-dialog-alert
 		:md-content="alert.content"
 		:md-ok-text="alert.ok"
-		@open="onOpen"
-		@close="onOpen"
 		ref="login-tip">
 	</md-dialog-alert>
   </form>
@@ -59,14 +58,17 @@
 </style>
 
 <script type="es6">
-  import { mapActions } from 'vuex'
+  import { mapActions, mapGetters } from 'vuex'
   export default{
     created () {
       this.setHeader({
       	title: '管理后台登录',
       	type: 'admin.login'
       })
+
+	  this.getAdmin.setToken(null)
     },
+
 	data(){
 	  return{
 	  	alert: {
@@ -85,6 +87,8 @@
 	},
 
 	computed: {
+	  ...mapGetters([ 'getAdmin' ]),
+
 	  adminData () {
 		return {
 		  account: this.account,
@@ -137,9 +141,6 @@
 	  		})
 	  },
 
-	  onOpen() {
-		// console.log(this.userData);
-	  },
 	  openDialog(ref, msg) {
 	  	this.alert.content = msg
       	this.$refs[ref].open()

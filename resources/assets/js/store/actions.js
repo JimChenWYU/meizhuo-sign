@@ -47,3 +47,11 @@ export const setAdmin = ({ commit }, admin) => {
     })
   }
 }
+
+export const setListCondition = ({ commit }, listCondition) => {
+  if (typeof listCondition !== 'undefined') {
+    commit(types.ADMIN_SET_LIST_CONDITION, {
+      listCondition: listCondition
+    })
+  }
+}

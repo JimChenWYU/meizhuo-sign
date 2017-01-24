@@ -45,17 +45,19 @@ class Signer extends Model
         return $response('error', false);
     }
 
-    public function getSigner(array $where=[], $current_page=1, array $select=null)
+    public function getSigner(array $where=[], array $select=null,
+        array $pagination=[])
     {
-        $_page = is_numeric($current_page) ? $current_page : 1;
+        $_page = isset($pagination['page']) && is_numeric($pagination['page']) ? $pagination['page'] : 1;
+        $_size = isset($pagination['size']) && is_numeric($pagination['size']) ? $pagination['size'] : 7;
 
         $_select = isset($select) && is_array($select) ?
-            $select : (is_array($current_page) ? $current_page : []);
+            $select : [];
 
         $signer = $this
             ->where($where)
             ->select($_select)
-            ->paginate(7, ['*'], 'page', $_page)
+            ->paginate($_size, ['*'], 'page', $_page)
             ->toArray();
 
         return $signer;
