@@ -11,5 +11,6 @@ export default {
   adminLogout: '/admin/out',
   adminPermission: '/admin/permission',
   adminSigners: '/admin/signers',
-  adminSigner: '/admin/signer'
+  adminSigner: '/admin/signer',
+  adminInterviewLogin: '/admin/department'
 }

@@ -5,7 +5,7 @@
 		<div>
 		  <img class="" src="../../assets/images/mz.png" alt="meizhuo logo">
 		  <span>{{verifyAdmin.welcome}}
-			<a href="/admin"
+			<a href="/admin/login"
 			   class="md-raised md-primary">
 			  {{verifyAdmin.operate}}
 			</a>

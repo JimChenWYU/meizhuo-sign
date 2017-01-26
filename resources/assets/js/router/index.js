@@ -24,6 +24,10 @@ const router = new VueRouter({
       children: admin
     },
     {
+      path: '/test',
+      component: require('../components/test'),
+    },
+    {
       path: '*',
       redirect:'/user'
     }

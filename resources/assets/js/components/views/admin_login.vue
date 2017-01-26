@@ -6,7 +6,7 @@
             <md-layout md-flex="20" md-hide-xsmall></md-layout>
             <md-layout md-flex="10"></md-layout>
             <md-layout md-column>
-                <k-login></k-login>
+                <router-view></router-view>
             </md-layout>
             <md-layout md-flex="10"></md-layout>
             <md-layout md-flex="20" md-hide-xsmall></md-layout>

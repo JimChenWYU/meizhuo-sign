@@ -31,11 +31,27 @@ Route::group([ 'middleware' => [ 'jwt.auth' ] ], function () {
 
 });
 
+Route::get('admin/department', 'ManagerController@setDepartmentPage');
 
+Route::post('admin/department', 'ManagerController@setDepartment');
+Route::put('admin/department', 'ManagerController@EndingInterview');
+
+Route::get('admin/sign', 'ManagerController@enQueue');
+Route::get('admin/queue', 'ManagerController@getQueue');
+Route::delete('admin/queue', 'ManagerController@deQueueByIndex');
+Route::patch('admin/queue', 'ManagerController@deQueue');
 
 Route::get('test', function () {
    return view('index', [
        'title' => 'test',
        'type' => '__TEST__'
    ]);
+});
+
+Route::get('event', function () {
+
+    Event::fire(
+        new App\Events\broadcastSignerEvent(Signer::first(),
+            request()->only(['department', 'tab'])));
+    return 'Hello';
 });

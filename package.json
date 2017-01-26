@@ -26,7 +26,12 @@
     "webpack-merge": "^2.4.0"
   },
   "dependencies": {
+    "ioredis": "^2.5.0",
     "laravel-elixir": "^6.0.0-14",
+    "socket.io": "^1.7.2",
     "vue-material": "^0.6.3"
+  },
+  "scripts": {
+    "serve": "node ./resources/assets/node/server.js"
   }
 }

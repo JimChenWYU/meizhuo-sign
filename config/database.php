@@ -122,6 +122,21 @@ return [
             'database' => 0,
         ],
 
+        /**session 使用redis的数据库1 需要在session配置文件指定**/
+        'session' => [
+            'host'     => env('REDIS_HOST', 'localhost'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port'     => env('REDIS_PORT', 6379),
+            'database' => 1,
+        ],
+
+        /**messageQueue消息队列 使用redis数据库2 需要在queue配置文件指定**/
+        'messageQueue' => [
+            'host'     => env('REDIS_HOST', 'localhost'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port'     => env('REDIS_PORT', 6379),
+            'database' => 2,
+        ],
     ],
 
 ];

@@ -3,9 +3,25 @@
  */
 const admin = [
   {
-    name: 'admin.login',
     path: '/',
-    component: require('../components/views/admin_login')
+    component: require('../components/views/admin_login'),
+    children: [
+      {
+        name: 'admin.login',
+        path: '/admin/login',
+        component: require('../components/module/login')
+      },
+      {
+        name: 'admin.department',
+        path:'/admin/department',
+        component: require('../components/module/interview_form')
+      },
+      {
+        name: 'admin',
+        path: '/',
+        redirect: '/admin/login'
+      }
+    ]
   },
   {
     name: 'admin.show',

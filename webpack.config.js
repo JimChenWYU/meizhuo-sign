@@ -27,7 +27,8 @@ var base = {
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.min.js',
-      'logger': 'vuex/dist/logger.js'
+      'logger': 'vuex/dist/logger.js',
+      'socket.io': 'socket.io-client/dist/socket.io.js',
     },
     extensions: ['', '.js', '.vue'] // 引用js和vue文件可以省略后缀名
   },
