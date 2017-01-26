@@ -27,5 +27,7 @@ class EventBroadcastEndingInterviewListener
     public function handle(broadcastEndingInterviewEvent $event)
     {
         //
+        $redis_signer = $event->redis_array;
+        \Log::info('广播消息：'.$event->message, compact('redis_signer'));
     }
 }

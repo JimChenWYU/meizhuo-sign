@@ -10,9 +10,9 @@ class broadcastEndingInterviewEvent extends Event implements ShouldBroadcast
 {
     use SerializesModels;
 
-    protected $message;
+    public $message;
 
-    protected $redis_array;
+    public $redis_array;
     /**
      * Create a new event instance.
      *

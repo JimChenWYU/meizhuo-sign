@@ -297,6 +297,28 @@ class ManagerController extends Auth\AuthController
     }
 
     /**
+     * name : outDepartment
+     * description : 面试官退出登录
+     * @param Request $request
+     * @return mixed
+     */
+    public function outDepartment(Request $request)
+    {
+        $unique_id = $request->session()->getId();
+
+        $group = redis()->get($unique_id);
+
+//        dd($group);
+        redis()->multi();
+        redis()->srem(self::$SET_QUEUE_KEY['interviewer-login'], $group);
+        redis()->del([$unique_id]);
+        redis()->exec();
+
+        $redirect = '/admin/department';
+        return $this->ajax(response_array('out success', compact('redirect')));
+    }
+
+    /**
      * name : enQueue
      * description : 入队签到
      * @param Request $request

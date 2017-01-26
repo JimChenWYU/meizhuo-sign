@@ -33,7 +33,11 @@ Route::group([ 'middleware' => [ 'jwt.auth' ] ], function () {
 
 Route::get('admin/department', 'ManagerController@setDepartmentPage');
 
+/**面试官登录或退出**/
 Route::post('admin/department', 'ManagerController@setDepartment');
+Route::delete('admin/department', 'ManagerController@outDepartment');
+
+/**结束面试通知**/
 Route::put('admin/department', 'ManagerController@EndingInterview');
 
 Route::get('admin/sign', 'ManagerController@enQueue');
@@ -41,17 +45,19 @@ Route::get('admin/queue', 'ManagerController@getQueue');
 Route::delete('admin/queue', 'ManagerController@deQueueByIndex');
 Route::patch('admin/queue', 'ManagerController@deQueue');
 
-Route::get('test', function () {
-   return view('index', [
-       'title' => 'test',
-       'type' => '__TEST__'
-   ]);
-});
 
-Route::get('event', function () {
+if (env('APP_DEBUG', false)) {
+    Route::get('test', function () {
+        return view('index', [
+            'title' => 'test',
+            'type' => '__TEST__'
+        ]);
+    });
 
-    Event::fire(
-        new App\Events\broadcastSignerEvent(Signer::first(),
-            request()->only(['department', 'tab'])));
-    return 'Hello';
-});
+    Route::get('event', function () {
+        Event::fire(
+            new App\Events\broadcastSignerEvent(Signer::first(),
+                request()->only(['department', 'tab'])));
+        return 'Hello';
+    });
+}

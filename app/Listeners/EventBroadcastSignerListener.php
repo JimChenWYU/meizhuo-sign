@@ -27,5 +27,8 @@ class EventBroadcastSignerListener
     public function handle(broadcastSignerEvent $event)
     {
         //
+        $group = $event->group;
+        $signer = $event->signer;
+        \Log::info('广播签到者信息：', compact('group', 'signer'));
     }
 }
