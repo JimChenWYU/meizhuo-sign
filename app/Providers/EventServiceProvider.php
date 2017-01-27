@@ -22,6 +22,10 @@ class EventServiceProvider extends ServiceProvider
 
         'App\Events\broadcastEndingInterviewEvent' => [
             'App\Listeners\EventBroadcastEndingInterviewListener',
+        ],
+
+        'App\Events\broadcastMessageEvent' => [
+            'App\Listeners\EventBroadcastMessageListener',
         ]
     ];
 

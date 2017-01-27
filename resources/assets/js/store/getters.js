@@ -17,3 +17,7 @@ export const getBody = state => {
 export const getAdmin = state => {
   return state.admin
 }
+
+export const getStore = state => {
+  return state.storage
+}

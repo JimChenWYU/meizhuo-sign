@@ -10,6 +10,7 @@ import header from './modules/header'
 import footer from './modules/footer'
 import body from './modules/body'
 import admin from './modules/admin'
+import storage from './modules/sessionStorage'
 
 Vue.use(Vuex)
 
@@ -19,7 +20,7 @@ export default new Vuex.Store({
   actions,
   getters,
   modules: {
-    header, footer, body, admin
+    header, footer, body, admin, storage
   },
   strict: debug,
   plugins: debug ? [createLogger()] : []

@@ -17,6 +17,16 @@ const admin = [
         component: require('../components/module/interview_form')
       },
       {
+        name: 'admin.department.interview',
+        path:'/admin/department/interview',
+        component: require('../components/module/table_interview')
+      },
+      {
+        name: 'admin.department.sign',
+        path:'/admin/department/sign',
+        component: require('../components/module/sign_system')
+      },
+      {
         name: 'admin',
         path: '/',
         redirect: '/admin/login'

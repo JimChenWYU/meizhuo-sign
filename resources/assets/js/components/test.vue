@@ -50,7 +50,7 @@
 	created() {
 	  let socket = new this.$extension.io('ws://localhost:6001')
 	  console.log(socket)
-	  socket.on('channel-end-interview', (data) => {
+	  socket.on('channel-end-interview:App\\Events\\broadcastSignerEvent', (data) => {
 	    console.log(data)
 	  })
 	}

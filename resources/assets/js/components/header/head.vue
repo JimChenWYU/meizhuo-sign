@@ -13,7 +13,7 @@
   }
 </style>
 
-<script>
+<script type="es6">
   import { mapGetters } from 'vuex'
   import headSign from './head_sign'
   import headNav from './head_nav'

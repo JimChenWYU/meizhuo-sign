@@ -9,26 +9,25 @@ use Illuminate\Http\Request;
 
 class ManagerController extends Auth\AuthController
 {
-    private static $STATUE = [
-        '等待中' => 1,
-        '就绪中' => 2,
-        '面试中' => 3,
-    ];
-
-    private static $SET_QUEUE_KEY = [
-        'signer' => 'signer',
-        'interviewer-login' => 'interviewerLogin',
-        'interviewer' => 'interviewer',
-        'left-waiting-queue' => 'leftWaitingQueue'
-    ];
-
-    private static $MAP = [
+    public static $MAP = [
         '移动组',
         'Web组',
         '美工组',
         '营销策划'
     ];
 
+    public static $STATUE = [
+        '等待中' => 1,
+        '就绪中' => 2,
+        '面试中' => 3,
+    ];
+
+    public static $SET_QUEUE_KEY = [
+        'signer' => 'signer',
+        'interviewer-login' => 'interviewerLogin',
+        'interviewer' => 'interviewer',
+        'waiting-queue' => 'waitingQueue'
+    ];
     /**
      * name : index
      * description : 首页
@@ -67,7 +66,7 @@ class ManagerController extends Auth\AuthController
     public function setDepartmentPage()
     {
         return view('setDepartment', [
-            'title' => '面试官登录'
+            'title' => '签到系统'
         ]);
     }
 
@@ -276,6 +275,8 @@ class ManagerController extends Auth\AuthController
                 http_status('Precondition_Failed'));
         }
 
+        $this->accept_data['tab'] = intval($this->accept_data['tab']);
+
         $old = redis()->get($unique_id);
         $serialize_data = serialize($this->accept_data);
         $isPass = redis()->sadd(self::$SET_QUEUE_KEY['interviewer-login'], $serialize_data);
@@ -284,11 +285,11 @@ class ManagerController extends Auth\AuthController
             redis()->srem(self::$SET_QUEUE_KEY['interviewer-login'], $old);
         }
 
-        $redirect = '/admin/department';
+        $redirect = '/admin/department/interview';
 
-//        dd(redis()->get($unique_id));
         if ($isPass && redis()->set($unique_id, $serialize_data)) {
-            return $this->ajax(response_array('登录成功！'));
+            setcookie('session_id', $unique_id);
+            return $this->ajax(response_array('登录成功！', compact('redirect')));
         }
 
         return $this->ajax(
@@ -340,7 +341,7 @@ class ManagerController extends Auth\AuthController
         $this->accept_data = $request->only([ 'student_id', 'name', 'department' ]);
 
         $validator = $this->validator($this->accept_data, [
-            'student_id' => 'required|numeric',
+            'student_id' => 'required|digits:10',
             'name' => 'required',
             'department' => 'required|in:'.implode(',', self::$MAP)
         ]);
@@ -370,11 +371,11 @@ class ManagerController extends Auth\AuthController
 
 //        dd($signer);
         // set集合防止重复签到
-        if (redis()->sadd(self::$SET_QUEUE_KEY['signer'], serialize($signer))) {
-            $redis_key = redis()->rpush($signer['department'], serialize($signer));
+        if (redis('db')->sadd(self::$SET_QUEUE_KEY['signer'], serialize($signer))) {
+            $redis_key = redis('db')->rpush($signer['department'], serialize($signer));
         } else {
             return $this->ajax(
-                response_array('已经成功签到！'),
+                response_array('已经签到，请勿重复！'),
                 http_status('Accepted'));
         }
 
@@ -433,21 +434,21 @@ class ManagerController extends Auth\AuthController
      * @param Request $request
      * @return mixed
      */
-    public function  EndingInterview(Request $request)
+    public function endingInterview(Request $request)
     {
         $unique_id = $request->session()->getId();
         $group = redis()->get($unique_id);
+        $redirect = '/admin/department';
 
         if (! isset($group)) {
             return $this->ajax(
-                response_array('您尚未登录或登录过期！'),
+                response_array('您尚未登录或登录过期！', compact('redirect')),
                 http_status('Forbidden'));
         }
 
-        $this->dispatch(new InformProscenium(
-            unserialize($group), $this->_getQueue()));
+        $this->dispatch(new InformProscenium(unserialize($group)));
 
-        return $this->ajax(response_array('请等待...'));
+        return $this->ajax(response_array('请稍等...'));
     }
 
     /**
@@ -457,7 +458,7 @@ class ManagerController extends Auth\AuthController
      */
     public function getQueue()
     {
-        return $this->ajax(response_array($this->_getQueue()));
+        return $this->ajax(response_array($this->getQueueArray()));
     }
 
     /**
@@ -486,23 +487,23 @@ class ManagerController extends Auth\AuthController
          */
 //        $dept_list_length = redis()->llen($this->accept_data['department']);
 //        $index = ($dept_list_length - 1) - $this->accept_data['index'];
-        $signer = redis()->lindex(
+        $signer = redis('db')->lindex(
             $this->accept_data['department'], $this->accept_data['index']);
 
-        redis()->multi();
+        redis('db')->multi();
 
         // 获取要删除签到者的信息，便于在set集合中删除，预防再次签到时无法签到
         // 删除集合中的记录
-        redis()->srem(self::$SET_QUEUE_KEY['signer'], $signer);
+        redis('db')->srem(self::$SET_QUEUE_KEY['signer'], $signer);
 
         /**根据索引删除**/
-        redis()->lset($this->accept_data['department'],
+        redis('db')->lset($this->accept_data['department'],
             $this->accept_data['index'], 'delete');
-        redis()->lrem($this->accept_data['department'],
+        redis('db')->lrem($this->accept_data['department'],
             $this->accept_data['index'], 'delete');
         /****/
 
-        redis()->exec();
+        redis('db')->exec();
 
         return $this->getQueue();
     }
@@ -519,20 +520,18 @@ class ManagerController extends Auth\AuthController
         return $this->ajax(response_array('ok', $payload->get('permission')));
     }
 
-    protected function getSet()
-    {
-        return array_map(function($value) {
-            return unserialize($value);
-        },redis()->smembers(self::$SET_QUEUE_KEY['signer']));
-    }
-
-    protected function _getQueue()
+    /**
+     * name : getQueueArray
+     * description : 获取所有签到信息
+     * @return array
+     */
+    public function getQueueArray()
     {
         $redis_array = [];
 
         foreach (self::$MAP as &$value) {
-            $length = redis()->llen($value);
-            $redis = redis()->lrange($value, 0, $length);
+            $length = redis('db')->llen($value);
+            $redis = redis('db')->lrange($value, 0, $length);
 
             $redis = array_map(function ($value) {
                 return unserialize($value);
@@ -542,10 +541,45 @@ class ManagerController extends Auth\AuthController
 
 //            test(json$redis);
             $redis_array = array_merge($redis_array, [
-                $value => array_values($redis)
+                self::mapDepartment($value) => array_values($redis)
             ]);
         }
 
         return $redis_array;
+    }
+
+    /**
+     * name : mapDepartment
+     * description : 获取对应的名字
+     * @static      * @param $name
+     * @return mixed
+     */
+    public static function mapDepartment($name)
+    {
+        static $map = [
+            '移动组' => 'android',
+            'Web组' => 'web',
+            '美工组' => 'design',
+            '营销策划' => 'marking',
+        ];
+
+        return $map[$name];
+    }
+
+    protected function enWaitingQueue(array $group)
+    {
+        return redis()->rpush(self::$SET_QUEUE_KEY['waiting-queue'], $group);
+    }
+
+    /**
+     * name : getSet
+     * description :
+     * @return array
+     */
+    protected function getSet()
+    {
+        return array_map(function($value) {
+            return unserialize($value);
+        },redis()->smembers(self::$SET_QUEUE_KEY['signer']));
     }
 }

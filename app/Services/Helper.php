@@ -64,8 +64,11 @@ if (! function_exists('http_status')) {
 }
 
 if (! function_exists('redis')) {
-    function redis()
+    function redis($db = false)
     {
+        if ($db && is_string($db)) {
+            return Redis::connection($db);
+        }
         return Redis::connection();
     }
 }

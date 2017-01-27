@@ -30,7 +30,7 @@ class SignController extends Auth\AuthController
 
         $validator = $this->validator($this->accept_data, [
             'name' => 'required',
-            'student_id' => 'required|numeric',
+            'student_id' => 'required|digits:10',
             'major' => 'required',
             'phone_num' => 'required',
             'grade' => 'required',

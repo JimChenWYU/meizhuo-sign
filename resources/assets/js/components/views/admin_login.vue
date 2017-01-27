@@ -2,15 +2,17 @@
     <div class="admin-login__container">
         <k-head></k-head>
 
-        <md-layout md-gutter>
-            <md-layout md-flex="20" md-hide-xsmall></md-layout>
-            <md-layout md-flex="10"></md-layout>
-            <md-layout md-column>
-                <router-view></router-view>
-            </md-layout>
-            <md-layout md-flex="10"></md-layout>
-            <md-layout md-flex="20" md-hide-xsmall></md-layout>
-        </md-layout>
+        <router-view></router-view>
+
+        <!--<md-layout md-gutter>-->
+            <!--<md-layout md-flex="20" md-hide-xsmall></md-layout>-->
+            <!--<md-layout md-flex="10"></md-layout>-->
+            <!--<md-layout md-column>-->
+                <!--<router-view></router-view>-->
+            <!--</md-layout>-->
+            <!--<md-layout md-flex="10"></md-layout>-->
+            <!--<md-layout md-flex="20" md-hide-xsmall></md-layout>-->
+        <!--</md-layout>-->
 
         <k-footer class="admin-login__footer"></k-footer>
     </div>

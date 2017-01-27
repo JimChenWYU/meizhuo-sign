@@ -32,13 +32,15 @@ Route::group([ 'middleware' => [ 'jwt.auth' ] ], function () {
 });
 
 Route::get('admin/department', 'ManagerController@setDepartmentPage');
+Route::get('admin/department/sign', 'ManagerController@setDepartmentPage');
+Route::get('admin/department/interview', 'ManagerController@setDepartmentPage');
 
 /**面试官登录或退出**/
 Route::post('admin/department', 'ManagerController@setDepartment');
 Route::delete('admin/department', 'ManagerController@outDepartment');
 
 /**结束面试通知**/
-Route::put('admin/department', 'ManagerController@EndingInterview');
+Route::put('admin/department', 'ManagerController@endingInterview');
 
 Route::get('admin/sign', 'ManagerController@enQueue');
 Route::get('admin/queue', 'ManagerController@getQueue');
@@ -47,11 +49,9 @@ Route::patch('admin/queue', 'ManagerController@deQueue');
 
 
 if (env('APP_DEBUG', false)) {
-    Route::get('test', function () {
-        return view('index', [
-            'title' => 'test',
-            'type' => '__TEST__'
-        ]);
+    Route::get('test', function (\Illuminate\Http\Request $request) {
+        setcookie('session_id', $request->session()->getId());
+        return $request->session()->getId();
     });
 
     Route::get('event', function () {

@@ -12,6 +12,11 @@
 
 <script>
   export default {
-	props: [ 'title' ]
+	props: {
+	  title: {
+	  	type:[ String ],
+	  	default: '标题'
+	  }
+	}
   }
 </script>

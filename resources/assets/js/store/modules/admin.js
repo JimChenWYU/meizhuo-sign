@@ -4,6 +4,7 @@
 import * as types from '../mutation-types'
 
 const key = 'token'
+const msg = 'msg'
 
 const state = {
   setToken: (value) => window.localStorage.setItem(key, value),
