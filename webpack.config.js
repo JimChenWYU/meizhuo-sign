@@ -9,7 +9,7 @@ var base = {
   entry: {
     app: './resources/assets/js/main.js',
     vendor: [ 'vue', 'vue-router', 'axios',
-      'vuex', 'vuerify', 'vue-material', 'lodash' ]
+      'vuex', 'vuerify', 'vue-material', 'lodash', 'vue-cookie' ]
   },
   // 输出配置
   output: {

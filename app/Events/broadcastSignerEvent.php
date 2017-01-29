@@ -18,11 +18,11 @@ class broadcastSignerEvent extends Event implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(array $group, Signer $signer)
+    public function __construct(array $group, array $signer)
     {
         //
-        $this->signer = $signer;
         $this->group = $group;
+        $this->signer = $signer;
     }
 
     /**
@@ -32,7 +32,7 @@ class broadcastSignerEvent extends Event implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return [ 'channel-'.$this->group['department'].'-'.$this->group['tab'] ];
+        return [ 'channel-'.$this->group['department'] ];
 //        return [ 'news' ];
     }
 

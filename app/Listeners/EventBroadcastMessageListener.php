@@ -28,6 +28,6 @@ class EventBroadcastMessageListener
     public function handle(broadcastMessageEvent $event)
     {
         //
-        \Log::info($event->message, [ 'Now_Time' => Carbon::now() ]);
+        \Log::info($event->message, [ 'type' => $event->type ]);
     }
 }

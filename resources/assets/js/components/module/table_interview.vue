@@ -62,7 +62,7 @@
 </style>
 
 <script type="es6">
-  import { mapActions } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
   export default {
 	data(){
 	  return{
@@ -95,6 +95,7 @@
 	},
 
 	computed: {
+			...mapGetters([ 'getStore' ]),
 	  snackbarMsg() {
 	    return this.snackbar.msg
 	  }
@@ -118,6 +119,13 @@
 			})
 	  },
 
+	  enSureDeQueueSuccess(data) {
+	  	this.$http.put(this.$env.adminQueue, data)
+			.catch(error => {
+			  console.log(error)
+			})
+	  },
+
 	  out() {
 	    this.$http.delete(this.$env.adminDepartment)
 			.then(response => {
@@ -135,18 +143,31 @@
 		if (this.$extension.isFunction(callback)) {
 		  callback()
 		}
+		// console.log(this.$refs[ref])
 		this.$refs[ref].open()
 	  },
 
 	  onMessage() {
-		this.socket.on('channel-message:App\\Events\\broadcastMessageEvent', res => {
-		  // console.log(res)
-		  this.openDialog('snackbar', () => {
-			this.snackbar.msg = res.msg
-		  })
-
+		this.socket.on('channel-message-interview:App\\Events\\broadcastMessageEvent', res => {
+		  console.log(res)
+		  if (res.msg) {
+			this.openDialog('snackbar', () => {
+			  this.snackbar.msg = res.msg
+			})
+		  }
 		})
 	  },
+
+	  onUpdate() {
+		this.socket.on(`channel-${this.getStore.getStorage('department')}:App\\Events\\broadcastSignerEvent`, res => {
+		  console.log(res)
+		  this.person.info = res.data
+		  this.enSureDeQueueSuccess({
+		    del_key: res.data['del_key'],
+			department: res.data['department']
+		  })
+		})
+	  }
 	},
 
 	created() {
@@ -155,10 +176,13 @@
 		title: '面试官',
 		type: 'admin.login'
 	  })
+	  this.getStore.setStorage('department', this.$cookie.get('department'))
 	},
 
 	mounted() {
 	  this.onMessage()
+	  this.onUpdate()
+	  // console.log(this.$cookie.get('department'))
 	},
 
 	beforeRouteLeave (to, from, next) {

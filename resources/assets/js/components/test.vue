@@ -53,6 +53,10 @@
 	  socket.on('channel-end-interview:App\\Events\\broadcastSignerEvent', (data) => {
 	    console.log(data)
 	  })
+
+	  socket.on('channel-Web组:App\\Events\\broadcastSignerEvent', (data) => {
+		console.log(data)
+	  })
 	}
   };
 </script>

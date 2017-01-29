@@ -46,6 +46,7 @@ Route::get('admin/sign', 'ManagerController@enQueue');
 Route::get('admin/queue', 'ManagerController@getQueue');
 Route::delete('admin/queue', 'ManagerController@deQueueByIndex');
 Route::patch('admin/queue', 'ManagerController@deQueue');
+Route::put('admin/queue', 'ManagerController@enSureDeQueueSuccess');
 
 
 if (env('APP_DEBUG', false)) {
@@ -55,9 +56,15 @@ if (env('APP_DEBUG', false)) {
     });
 
     Route::get('event', function () {
+//        dd(Signer::first()->toArray());
         Event::fire(
-            new App\Events\broadcastSignerEvent(Signer::first(),
-                request()->only(['department', 'tab'])));
+            new App\Events\broadcastSignerEvent(request()->only(['department', 'tab']), Signer::first()->toArray()));
         return 'Hello';
     });
+
+    Route::get('redis', function () {
+        Redis::publish('channel-update-success', json_encode(['foo' => 'bar']));
+    });
+
+    Route::get('reset', 'ManagerController@resetAll');
 }

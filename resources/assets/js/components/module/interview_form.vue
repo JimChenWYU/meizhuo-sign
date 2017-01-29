@@ -38,7 +38,6 @@
 
 			<md-layout md-column>
 			  <md-button class="md-raised md-primary" type="submit" md-fab-bottom-center>确定</md-button>
-			  <md-button class="md-raised md-primary" @click="log" md-fab-bottom-center>show</md-button>
 			</md-layout>
 
 			<md-spinner
@@ -170,12 +169,6 @@
 
 	  closeDialog(ref) {
 		this.$refs[ref].close()
-	  },
-
-	  log() {
-	    console.log(this.l_department)
-	    console.log(this.l_tab)
-		this.$router.replace({ path: '/admin/department', query: { id: Math.random() } })
 	  }
 	},
 

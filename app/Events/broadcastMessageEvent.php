@@ -11,15 +11,21 @@ class broadcastMessageEvent extends Event implements ShouldBroadcast
     use SerializesModels;
 
     public $message;
+
+    public $data;
+
+    public $type;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($message)
+    public function __construct($message, array $data = [], $type = 'interview')
     {
         //
         $this->message = $message;
+        $this->data = $data;
+        $this->type = $type;
     }
 
     /**
@@ -29,11 +35,12 @@ class broadcastMessageEvent extends Event implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return [ 'channel-message' ];
+        $channel = 'channel-message-'.$this->type;
+        return [ $channel ];
     }
 
     public function broadcastWith()
     {
-        return response_array($this->message);
+        return response_array($this->message, $this->data);
     }
 }

@@ -61,60 +61,100 @@
 		<md-layout :md-gutter="24">
 		  <md-layout v-for="dept of l_dept">
 			<span class="md-title">{{dept.name}}</span>
+			<span class="md-span">
+			  <md-button class="md-icon-button" title="出队面试"
+						 @click="openDialog('confirmDeQueue', dept)">
+			  	<md-icon>queue_play_next</md-icon>
+			  </md-button>
+			</span>
 		  </md-layout>
 		</md-layout>
 	  </md-card-header>
 	  <md-layout :md-gutter="20">
 		<md-list class="md-layout">
-		  <md-list-item v-for="android of dept.android">
+		  <md-list-item v-for="(android, index) of dept.android">
 			<span>{{android.name}}</span>
 			<k-span :status="android.status"></k-span>
+			<md-button class="md-icon-button" @click="deQueueByIndex(android.department, index)">
+			  <md-icon>delete</md-icon>
+			</md-button>
 		  </md-list-item>
 		</md-list>
 
 		<md-list class="md-layout">
-		  <md-list-item v-for="web of dept.web">
+		  <md-list-item v-for="(web, index) of dept.web">
 			<span>{{web.name}}</span>
 			<k-span :status="web.status"></k-span>
+			<md-button class="md-icon-button" @click="deQueueByIndex(web.department, index)">
+			  <md-icon>delete</md-icon>
+			</md-button>
 		  </md-list-item>
 		</md-list>
 
 		<md-list class="md-layout">
-		  <md-list-item v-for="design of dept.design">
+		  <md-list-item v-for="(design, index) of dept.design">
 			<span>{{design.name}}</span>
 			<k-span :status="design.status"></k-span>
+			<md-button class="md-icon-button" @click="deQueueByIndex(design.department, index)">
+			  <md-icon>delete</md-icon>
+			</md-button>
 		  </md-list-item>
 		</md-list>
 
 		<md-list class="md-layout">
-		  <md-list-item v-for="marking of dept.marking">
+		  <md-list-item v-for="(marking, index) of dept.marking">
 			<span>{{marking.name}}</span>
 			<k-span :status="marking.status"></k-span>
+			<md-button class="md-icon-button" @click="deQueueByIndex(marking.department, index)">
+			  <md-icon>delete</md-icon>
+			</md-button>
 		  </md-list-item>
 		</md-list>
 	  </md-layout>
 	</md-card>
 
+	<!-- 签到提交 -->
 	<md-dialog-confirm
-		  :md-title="confirm.title"
-		  :md-content-html="confirm.contentHtml"
+		  md-title="确认框"
+		  md-content-html="<h3>您确定提交吗？</h3>"
 		  md-ok-text="确定"
 		  md-cancel-text="取消"
 		  @close="onConfirmClose"
 		  ref="confirmSubmit">
 	</md-dialog-confirm>
 
-	  <!-- 弹框 -->
+	<!-- 删除提交 -->
+	<md-dialog-confirm
+		:md-title="confirm.title"
+		:md-content-html="confirm.contentHtml"
+		md-ok-text="确定"
+		md-cancel-text="取消"
+		@close="onDeleteQueueClose"
+		ref="confirmDelete">
+	</md-dialog-confirm>
+
+	<!-- 出对面试 -->
+	<md-dialog-confirm
+		md-title="确认框"
+		md-content-html="<h3>您确认出队吗？</h3>"
+		md-ok-text="确定"
+		md-cancel-text="取消"
+		@close="onDeQueueClose"
+		ref="confirmDeQueue">
+	</md-dialog-confirm>
+
+	<!-- 弹框 -->
 	<md-dialog-alert
-		  :md-content="alert.content"
-		  md-ok-text="确定"
-		  ref="tip">
+		:md-content="alert.content"
+		md-ok-text="确定"
+		ref="tip">
 	</md-dialog-alert>
 
 	<md-snackbar :md-position="snackbar.vertical + ' ' + snackbar.horizontal" ref="snackbar" :md-duration="snackbar.duration">
 	  <span>{{snackbarMsg()}}</span>
 	  <md-button class="md-accent" md-theme="light-blue" @click="$refs.snackbar.close()">OK</md-button>
 	</md-snackbar>
+
   </form>
 </template>
 
@@ -128,11 +168,14 @@
   .md-theme-light-blue.md-button:not([disabled]).md-accent:not(.md-icon-button) {
 	color: #ffeb3b;
   }
+  .md-span {
+	padding-left: 10px;
+  }
 </style>
 
 <script type="es6">
   import kSpan from '../module/status'
-    import { mapGetters, mapActions } from 'vuex'
+  import { mapGetters, mapActions } from 'vuex'
   export default{
 	components: { kSpan },
 
@@ -175,6 +218,11 @@
 		  design: [],
 		  marking: []
 		},
+		delCondition: {
+		  department: '',
+		  index: ''
+		},
+		condition: {},
 		student_id: '3114002521',
 		name: '陈君武',
 		department: '移动组'
@@ -220,9 +268,7 @@
 			})
 			return false
 		  }
-
-		  let data = response.data.data
-		  this.dept = data
+		  this.dept = response.data.data
 		})
 		.catch(error => {
 		  this.openDialog('tip', () => {
@@ -231,9 +277,41 @@
 		})
 	  },
 
+	  deQueueByIndex(department, index) {
+
+	    this.delCondition = {
+	      department: department,
+		  index: index
+		}
+
+		this.openDialog('confirmDelete', () => {
+		  this.confirm.contentHtml = "<h3>您确定删除吗？</h3>"
+		})
+
+	  },
+
+	  deQueue() {
+		this.$http.patch(this.$env.adminQueue, {
+		  department: this.condition.value
+		})
+		.then(response => {
+		  console.log(response)
+		  if (response.status === 202) {
+		    this.openDialog('tip', () => {
+		      this.alert.content = response.data.msg
+			})
+		  }
+		})
+		.catch(error => {
+		  console.log(error)
+		})
+	  },
+
 	  openDialog(ref, callback) {
 		if (this.$extension.isFunction(callback)) {
 		  callback(this.$refs[ref]);
+		} else {
+		  this.condition = callback
 		}
 		this.$refs[ref].open();
 	  },
@@ -244,12 +322,49 @@
 		}
 	  },
 
+	  onDeleteQueueClose(type) {
+	    // console.log(type)
+	    if (type === 'ok') {
+	      this.$http.delete(this.$env.adminQueue, {
+	        data: this.delCondition
+		  })
+		  .then(response => {
+			// console.log(response)
+			this.dept = response.data.data
+		  })
+		  .catch(error => {
+			console.log(error)
+			this.openDialog('tip', () => {
+			  this.alert.content = error.msg
+			})
+		  })
+		}
+	  },
+
+	  onDeQueueClose(type) {
+		if (type === 'ok') {
+		  console.log(type)
+		  this.deQueue()
+		}
+	  },
+
 	  onEndInterview() {
 		this.socket.on('channel-end-interview:App\\Events\\broadcastEndingInterviewEvent', (res) => {
-		  // console.log(res)
-		  this.getStore.setStorage('msg', res.msg)
+		  console.log(res)
+		  this.dept = res.data.redis_array
+		  this.openDialog('snackbar', () => {
+			this.getStore.setStorage('msg', res.msg)
+		  })
+		})
+	  },
+
+	  onMessage() {
+	    this.socket.on('channel-message-sign:App\\Events\\broadcastMessageEvent', res => {
+	      console.log(res)
 		  this.dept = res.data
-		  this.$refs.snackbar.open()
+		  this.openDialog('snackbar', () => {
+			this.getStore.setStorage('msg', res.msg)
+		  })
 		})
 	  },
 
@@ -273,6 +388,7 @@
 
 	mounted() {
 	  this.onEndInterview()
+	  this.onMessage()
 	}
   }
 </script>

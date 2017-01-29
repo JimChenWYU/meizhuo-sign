@@ -35,21 +35,29 @@ class InformProscenium extends Job implements SelfHandling, ShouldQueue
     {
         $status = $ctrl::$STATUE;
 
-        $cache_signer = unserialize(redis()->lindex($this->group['department'], 0));
+        $cache_signer = unserialize(redis('db')->lindex($this->group['department'], 0));
 
         if ($cache_signer && $cache_signer['status'] === $status['等待中']) {
-//            dd($redis_array);
+
             $cache_signer['status'] = 2;
-            redis()->lset($this->group['department'], 0, serialize($cache_signer));
+            redis('db')->lset($this->group['department'], 0, serialize($cache_signer));
 
             $message = $this->group['department'].'第'.$this->group['tab'].'组面试完毕！';
-            \Event::fire(new broadcastEndingInterviewEvent($message, $ctrl->getQueueArray()));
-            \Event::fire(new broadcastMessageEvent('请稍等...'));
+
+            \Event::fire(new broadcastEndingInterviewEvent($message, $this->group, $ctrl->getQueueArray()));
+
+            \Event::fire(new broadcastMessageEvent('请稍等...', [], 'interview'));
+
         } elseif (! $cache_signer){
+
             $message = $this->group['department'].'已经没有人来面试！';
-            \Event::fire(new broadcastMessageEvent($message));
+
+            \Event::fire(new broadcastMessageEvent($message, [], 'interview'));
+
         } else {
-            \Event::fire(new broadcastMessageEvent('请稍等...'));
+
+            \Event::fire(new broadcastMessageEvent('请稍等一会儿...', $cache_signer, 'interview'));
+
         }
     }
 }

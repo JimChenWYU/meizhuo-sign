@@ -18,12 +18,14 @@ import VueMaterial from 'vue-material'
 import Vuerify from 'vuerify'
 import Extension from './utils/install'
 import Config from './config'
+import VueCookie from 'vue-cookie'
 import 'vue-material/dist/vue-material.css'
 
 Vue.use(VueMaterial)
 Vue.use(Vuerify)
 Vue.use(Extension)
 Vue.use(Config)
+Vue.use(VueCookie)
 
 /**
  * We'll register a HTTP interceptor to attach the "CSRF" header to each of

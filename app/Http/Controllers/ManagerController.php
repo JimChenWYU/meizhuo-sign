@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\broadcastEndingInterviewEvent;
+use App\Events\broadcastMessageEvent;
 use App\Events\broadcastSignerEvent;
 use App\Jobs\InformProscenium;
 use Illuminate\Http\Request;
@@ -269,6 +269,7 @@ class ManagerController extends Auth\AuthController
             'tab' => 'required|numeric'
         ]);
 
+//        dd(config('queue.default'));
         if ($validator->fails()) {
             return $this->ajax(
                 response_array($validator->errors()->first()),
@@ -276,9 +277,9 @@ class ManagerController extends Auth\AuthController
         }
 
         $this->accept_data['tab'] = intval($this->accept_data['tab']);
+        $serialize_data = serialize($this->accept_data);
 
         $old = redis()->get($unique_id);
-        $serialize_data = serialize($this->accept_data);
         $isPass = redis()->sadd(self::$SET_QUEUE_KEY['interviewer-login'], $serialize_data);
 
         if ($old && $isPass) {
@@ -288,7 +289,7 @@ class ManagerController extends Auth\AuthController
         $redirect = '/admin/department/interview';
 
         if ($isPass && redis()->set($unique_id, $serialize_data)) {
-            setcookie('session_id', $unique_id);
+            setcookie('department', $this->accept_data['department']);
             return $this->ajax(response_array('登录成功！', compact('redirect')));
         }
 
@@ -353,7 +354,7 @@ class ManagerController extends Auth\AuthController
         }
 
         $select = [ 'id', 'name', 'student_id',
-            'major', 'grade', 'department', 'introduce' ];
+            'major', 'grade', 'department', 'phone_num', 'introduce' ];
 
         $info = \Signer::getSigner($this->accept_data, $select);
 
@@ -394,38 +395,73 @@ class ManagerController extends Auth\AuthController
      */
     public function deQueue(Request $request)
     {
-        $this->accept_data = $request->only([ 'session_id' ]);
+        $this->accept_data = $request->only(['department']);
 
         $validator = $this->validator($this->accept_data, [
-            'session_id' => 'required|alpha_num',
+            'department' => 'required'
         ]);
 
         if ($validator->fails()) {
             return $this->ajax(
                 response_array($validator->errors()->first()),
-                http_status('Precondition_Failed'));
+                http_status('Unprocessable_Entity'));
         }
 
-        $group = unserialize(redis()->get($this->accept_data['session_id']));
+        $cache_signer = unserialize(
+            redis('db')->lindex($this->accept_data['department'], 0));
 
-        if ($group) {
-            $cache_signer = unserialize(redis()->lindex($group['department'], 0));
-            if (isset($cache_signer) &&
-                $cache_signer['status'] === self::$STATUE['就绪中']) {
-                $cache_signer['status'] = self::$STATUE['面试中'];
-                $signer = redis()->lpop($group['department']);
-                \Event::fire(new broadcastSignerEvent($group, $signer));
-                return $this->getQueue();
-            }
+        if (isset($cache_signer) &&
+            $cache_signer['status'] === self::$STATUE['就绪中']) {
 
-            $message = '确定'. $cache_signer['department']. '的' .$cache_signer['name'].' 已经处于就绪状态';
-            return $this->ajax(response_array($message), http_status('Accepted'));
+            $cache_signer['status'] = self::$STATUE['面试中'];
+            /**
+             * 获取删除key的权限
+             */
+            $del_key = uniqid();
+
+            redis()->multi();
+            redis()->set($del_key, $del_key);
+            redis()->expire($del_key, 30);
+            redis()->exec();
+
+            $cache_signer = array_add($cache_signer, 'del_key', $del_key);
+
+            \Event::fire(
+                new broadcastSignerEvent($this->accept_data, $cache_signer));
+
+            return $this->getQueue();
         }
 
-        $errMsg = __CLASS__.'@'.__FUNCTION__.': '.$this->accept_data['session_id'].'不存在于redis数据库中或者redis数据库取值失败！';
+        $message = '请确认下一位面试者是否就绪！';
+        return $this->ajax(response_array($message), http_status('Accepted'));
+    }
 
-        \Log::error($errMsg);
-        return $this->ajax(response_array('error'), http_status('Bad_Request'));
+
+    public function enSureDeQueueSuccess(Request $request)
+    {
+        $this->accept_data = $request->only([ 'del_key', 'department' ]);
+
+        $this->accept_data['del_key_confirm'] = redis()->get($this->accept_data['del_key']);
+
+        $validator = $this->validator($this->accept_data, [
+            'del_key' => 'required|same:del_key_confirm',
+            'department' => 'required|in:'.implode(',', self::$MAP)
+        ]);
+
+        if ($validator->fails()) {
+            return $this->ajax(response_array(
+                '你没有权限操作！'
+            ), http_status('Forbidden'));
+        }
+
+        redis()->multi();
+        redis()->del([ $this->accept_data['del_key'] ]);
+        redis('db')->lpop($this->accept_data['department']);
+        redis()->exec();
+
+        \Event::fire(new broadcastMessageEvent('可以进去面试', $this->getQueueArray(), 'sign'));
+
+        return $this->ajax(response_array());
     }
 
     /**
@@ -446,7 +482,9 @@ class ManagerController extends Auth\AuthController
                 http_status('Forbidden'));
         }
 
-        $this->dispatch(new InformProscenium(unserialize($group)));
+//        $group = array_add(unserialize($group), 'session_id', $unique_id);
+        $group = unserialize($group);
+        $this->dispatch(new InformProscenium($group));
 
         return $this->ajax(response_array('请稍等...'));
     }
@@ -489,6 +527,14 @@ class ManagerController extends Auth\AuthController
 //        $index = ($dept_list_length - 1) - $this->accept_data['index'];
         $signer = redis('db')->lindex(
             $this->accept_data['department'], $this->accept_data['index']);
+
+        $unserialize_signer = unserialize($signer);
+
+        if ($unserialize_signer['status'] !== self::$STATUE['等待中']) {
+            return $this->ajax(
+                response_array('该用户已经准备面试，不能删除！'),
+                http_status('Forbidden'));
+        }
 
         redis('db')->multi();
 
@@ -566,11 +612,24 @@ class ManagerController extends Auth\AuthController
         return $map[$name];
     }
 
-    protected function enWaitingQueue(array $group)
-    {
-        return redis()->rpush(self::$SET_QUEUE_KEY['waiting-queue'], $group);
-    }
 
+    public function resetAll()
+    {
+        foreach (self::$MAP as &$value) {
+            $data = redis('db')->lpop($value);
+
+            $data = unserialize($data);
+
+            if ($data) {
+
+                $data['status'] = self::$STATUE['等待中'];
+
+                redis('db')->lpush($value, serialize($data));
+            }
+        }
+
+        return $this->getQueue();
+    }
     /**
      * name : getSet
      * description :

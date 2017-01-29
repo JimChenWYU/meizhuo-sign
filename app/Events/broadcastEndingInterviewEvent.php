@@ -12,15 +12,18 @@ class broadcastEndingInterviewEvent extends Event implements ShouldBroadcast
 
     public $message;
 
+    public $group;
+
     public $redis_array;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($message, array $redis_array)
+    public function __construct($message, array $group, array $redis_array)
     {
         $this->message = $message;
+        $this->group = $group;
         $this->redis_array = $redis_array;
     }
 
@@ -36,6 +39,8 @@ class broadcastEndingInterviewEvent extends Event implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        return response_array($this->message, $this->redis_array);
+        $group = $this->group;
+        $redis_array = $this->redis_array;
+        return response_array($this->message, compact('group', 'redis_array'));
     }
 }

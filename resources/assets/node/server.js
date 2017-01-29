@@ -3,20 +3,19 @@
  */
 const app = require('http').createServer(handler);
 const fs = require('fs');
+const path = require('path');
 const io = require('socket.io')(app);
-
 const Redis = require('ioredis');
-const _redis = {
-  host: '119.29.244.34',
-  port: '6379',
-  password: 'chenjunwu007',
-  db: 1
-};
+
+
+const _redis = JSON.parse(fs.readFileSync(`${__dirname}/config.json`).toString()).redis;
+
+
 const redis = new Redis(_redis);
+const pub = new Redis(_redis);
 
 app.listen(6001, () => {
   console.log('Server is running!');
-  // console.log(__dirname);
 });
 
 function handler(req, res) {
@@ -37,6 +36,7 @@ redis.psubscribe('*', function(err, count) {
 
 redis.on('pmessage', function(subscribed, channel, message) {
   message = JSON.parse(message);
+  // console.log(subscribed);
   console.log(channel);
   console.log(message);
   // io.emit(channel + ':' + message.event, message.data);
