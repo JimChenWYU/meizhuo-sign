@@ -1,5 +1,4 @@
 const elixir = require('laravel-elixir');
-const gulp = require('gulp');
 
 require('laravel-elixir-vue-2');
 

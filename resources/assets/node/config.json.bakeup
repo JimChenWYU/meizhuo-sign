@@ -1,0 +1,9 @@
+{
+  "redis": {
+    "host": "",
+    "port": "",
+    "password": "",
+    "db": 1,
+    "family": 4
+  }
+}

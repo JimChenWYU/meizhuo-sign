@@ -9,7 +9,8 @@
         "laravel/framework": "5.1.*",
         "predis/predis": "^1.1",
         "tymon/jwt-auth": "^0.5.9",
-        "mews/captcha": "^2.1"
+        "mews/captcha": "^2.1",
+        "filp/whoops": "^2.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

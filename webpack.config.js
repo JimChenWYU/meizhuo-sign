@@ -3,13 +3,12 @@ var webpack = require('webpack')
 var merge = require('webpack-merge')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var BaseDir = '/'
-var env = 'dev' // production or dev
+var env = 'production' // production or dev
 
 var base = {
   entry: {
     app: './resources/assets/js/main.js',
-    vendor: [ 'vue', 'vue-router', 'axios',
-      'vuex', 'vuerify', 'vue-material', 'lodash', 'vue-cookie' ]
+    vendor: [ 'vue', 'vue-router', 'axios', 'vuex', 'vuerify', 'vue-material', 'lodash', 'vue-cookie' ]
   },
   // 输出配置
   output: {
@@ -61,7 +60,6 @@ var base = {
       }
     ]
   },
-  devtool: '#cheap-module-source-map',
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoErrorsPlugin()
@@ -70,9 +68,6 @@ var base = {
 
 
 var production = merge(base, {
-  stats: {
-    children: false
-  },
   module: {
     rules: [{
       enforce: 'pre',
@@ -84,6 +79,7 @@ var production = merge(base, {
       loader: 'url?limit=10000&name=' + BaseDir + 'images/[name].[ext]',
     }]
   },
+  devtool: '#source-map',
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
@@ -109,7 +105,7 @@ var production = merge(base, {
         })
       },
       eslint: {
-        configFile: '../.eslintrc'
+        configFile: './.eslintrc'
       }
     }),
     new webpack.optimize.CommonsChunkPlugin({
@@ -125,7 +121,7 @@ var dev = merge(base, {
       loader: 'url?limit=10000&name=images/[name].[ext]'
     }]
   },
-  devtool: '#cheap-eval-source-map',
+  devtool: '#eval-source-map',
   plugins: [
     new webpack.LoaderOptionsPlugin({
       vue: {

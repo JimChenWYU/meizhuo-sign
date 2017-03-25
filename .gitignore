@@ -8,3 +8,6 @@ _ide_helper.php
 .php_cs.cache
 /public/js
 packagebake.json
+config/ide-helper.php
+public/img/
+/resources/assets/node/config.json

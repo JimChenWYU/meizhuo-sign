@@ -16,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         //监听器
-        if (env('APP_DEBUG', false) && false) {
+        if (config('app.debug')) {
             \DB::listen(function ($sql, $bindings, $time) {
                 echo '<br/>SQL语句执行：'. $sql .'，参数：'. json_encode($bindings) .',耗时：'. $time .'ms<br/>';
             });

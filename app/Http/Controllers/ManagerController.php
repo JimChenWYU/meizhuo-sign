@@ -197,12 +197,10 @@ class ManagerController extends Auth\AuthController
 
         // 判别是否有数据
         if ($response['count'] > 0) {
-            return $this->ajax(
-                array_merge($info, $response));
+            return $this->ajax(array_merge($info, $response));
         }
 
-        return $this->ajax(
-            response_array(), http_status('No_Content'));
+        return $this->ajax(response_array(), http_status('No_Content'));
     }
 
     /**
@@ -436,7 +434,12 @@ class ManagerController extends Auth\AuthController
         return $this->ajax(response_array($message), http_status('Accepted'));
     }
 
-
+    /**
+     * name : enSureDeQueueSuccess
+     * description : 确认是否面试官是否收到信息
+     * @param Request $request
+     * @return mixed
+     */
     public function enSureDeQueueSuccess(Request $request)
     {
         $this->accept_data = $request->only([ 'del_key', 'department' ]);
@@ -459,7 +462,7 @@ class ManagerController extends Auth\AuthController
         redis('db')->lpop($this->accept_data['department']);
         redis()->exec();
 
-        \Event::fire(new broadcastMessageEvent('可以进去面试', $this->getQueueArray(), 'sign'));
+        \Event::fire(new broadcastMessageEvent('可以进去面试了！', $this->getQueueArray(), 'sign'));
 
         return $this->ajax(response_array());
     }

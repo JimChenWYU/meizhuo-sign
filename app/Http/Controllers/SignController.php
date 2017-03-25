@@ -34,7 +34,8 @@ class SignController extends Auth\AuthController
             'major' => 'required',
             'phone_num' => 'required',
             'grade' => 'required',
-            'department' => 'required'
+            'department' => 'required',
+            'introduce' => 'string|between:0, 300'
         ]);
 
         if ($validator->fails()) {
